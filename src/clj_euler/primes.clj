@@ -1,21 +1,45 @@
 (ns clj-euler.primes)
 
-(defn not-divisible-by? [num denum]
-  (not (= (mod num denum) 0)))
+(defn lazy-primes
+  "shamelessly stolen from http://clj-me.cgrand.net/2009/07/30/everybody-loves-the-sieve-of-eratosthenes/ (lazy-primes3)"
+  []
+  (letfn [(enqueue [sieve n step]
+            (let [m (+ n step)]
+              (if (sieve m)
+                (recur sieve m step)
+                (assoc sieve m step))))
+          (next-sieve [sieve candidate]
+            (if-let [step (sieve candidate)]
+              (-> sieve
+                  (dissoc candidate)
+                  (enqueue candidate step))
+              (enqueue sieve candidate (+ candidate candidate))))
+          (next-primes [sieve candidate]
+            (if (sieve candidate)
+              (recur (next-sieve sieve candidate) (+ candidate 2))
+              (cons candidate
+                    (lazy-seq (next-primes (next-sieve sieve candidate)
+                                           (+ candidate 2))))))]
+        (cons 2 (lazy-seq (next-primes {} 3)))))
 
-(defn primes
-  ([pos]
-     (primes (vec (range 2 pos)) 0))
-  ([clist pos]
-     (cond
-      (>= pos (count clist)) clist
-      :else
-      (let [val (nth clist pos)
-            starting (inc pos)]
-        (recur (into (subvec clist 0 starting)
-                     (vec (filter #(not-divisible-by? % val)
-                                  (subvec clist starting (count clist))))) starting)))))
+(defn n-primes [n]
+  (take n (lazy-primes)))
+
+(defn primes-below [ceil]
+  (take-while #(> ceil %) (lazy-primes)))
 
 (defn- benchmark-primes []
   (time (dotimes [n 10]
-          (primes 10000))))
+          (last (primes-below 100000)))))
+
+(defn- ends-with [c n]
+  (let [s  (str n)
+        ld (last s)]
+    (= c ld)))
+
+(comment time
+ (->> (lazy-primes)
+      (take 100000)
+      (filter (partial ends-with \0))
+      (last)
+      ))
