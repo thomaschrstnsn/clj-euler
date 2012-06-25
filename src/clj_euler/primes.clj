@@ -15,3 +15,7 @@
         (recur (into (subvec clist 0 starting)
                      (vec (filter #(not-divisible-by? % val)
                                   (subvec clist starting (count clist))))) starting)))))
+
+(defn- benchmark-primes []
+  (time (dotimes [n 10]
+          (primes 10000))))
