@@ -3,6 +3,7 @@
         clojure.contrib.greatest-least))
 
 (defn construct-cyclic-number
+  "See http://en.wikipedia.org/wiki/Cyclic_number#Construction_of_cyclic_numbers"
   ([p]   (construct-cyclic-number 10 p))
   ([b p]
      (loop [t 1, r 1, n 0]
