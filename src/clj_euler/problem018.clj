@@ -1,6 +1,6 @@
 (ns clj-euler.problem018
-  (:use clojure.string :as s
-        clj-euler.utils))
+  (:require [clojure.string :as s])
+  (:use clj-euler.utils))
 
 (def example-triangle
   "3
@@ -28,9 +28,9 @@
 (defn string->triangle [s]
   (->> (s/split-lines s)
        (clojure.core/reverse)
-       (map trim)
-       (map #(split % #" "))
-       (map (partial map s->i))))
+       (map s/trim)
+       (map #(s/split % #" "))
+       (map (partial map s->n))))
 
 (defn max-line [is]
   (map #(max %1 %2) is (rest is)))
@@ -50,3 +50,6 @@
 
 (defn problem []
   (->> problem-triangle string->triangle max-path-triangle))
+
+(defn -main []
+  (println (problem)))

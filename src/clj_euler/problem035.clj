@@ -1,12 +1,11 @@
 (ns clj-euler.problem035
-  (:use clj-euler.primes
-        clj-euler.utils
-        clojure.contrib.seq :as cseq))
+  (:require [clojure.contrib.seq :as cseq])
+  (:use [clj-euler primes utils]))
 
 (defn- rotations-of-number [n]
   (->> (str n)
        (cseq/rotations)
-       (map (comp s->i (partial apply str)))
+       (map (comp s->n (partial apply str)))
        ))
 
 (defn- contains-all-rotations? [s n]

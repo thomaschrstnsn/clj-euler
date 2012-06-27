@@ -9,8 +9,7 @@
              ": "
              (last (primes-below n))))))
 
-(defn- s->i [s]
-  (Integer/parseInt s 10))
+(defn- s->i [s] (Integer/parseInt s 10))
 
 (defn -main
   ([] (m))
