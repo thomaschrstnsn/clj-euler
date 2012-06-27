@@ -26,3 +26,6 @@
 (defn example [] (unit-fraction-below-n-with-most-digits 10))
 
 (defn problem [] (unit-fraction-below-n-with-most-digits 1000))
+
+(defn -main []
+  (println (problem)))

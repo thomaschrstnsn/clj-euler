@@ -22,3 +22,5 @@
 
 (defn problem []
   (->> 1000000 circular-primes-below count))
+
+(defn -main [] (println (problem)))
