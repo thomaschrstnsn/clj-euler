@@ -1,4 +1,5 @@
-(ns clj-euler.primes)
+(ns clj-euler.primes
+  (:require [clojure.contrib.math :as cmath]))
 
 (defn lazy-primes
   "shamelessly stolen from http://clj-me.cgrand.net/2009/07/30/everybody-loves-the-sieve-of-eratosthenes/ (lazy-primes3)"
@@ -27,6 +28,19 @@
 
 (defn primes-below [ceil]
   (take-while #(> ceil %) (lazy-primes)))
+
+(defn primes-upto-including [ceil]
+  (take-while #(<= % ceil) (lazy-primes)))
+
+(defn prime? [n]
+  (cond
+    (< n 1) false
+    (= n 2) true
+    :else (let [pb (->> n primes-upto-including last)]
+            (= n pb))))
+
+(defn coprime? [a b]
+  (= 1 (cmath/gcd a b)))
 
 (defn- benchmark-primes []
   (time (dotimes [n 10]
