@@ -32,12 +32,28 @@
 (defn primes-upto-including [ceil]
   (take-while #(<= % ceil) (lazy-primes)))
 
-(defn prime? [n]
+(defn prime?
+  "Shamelessly stolen from: http://technicalitee.blogspot.dk/2012/03/project-euler-problem-26-and-27.html
+   def isPrime(num: Int) = {
+    @tailrec def isPrime0(n: Int): Boolean = n match {
+      case 1 => true
+      case _ => if (num % n == 0) false else isPrime0(n - 1)
+    }
+    if (num % 2 == 0 || num < 1)
+      false
+    else
+      isPrime0(Math.sqrt(num).intValue)
+  }"
+  [n]
   (cond
     (< n 1) false
     (= n 2) true
-    :else (let [pb (->> n primes-upto-including last)]
-            (= n pb))))
+    :else (loop [f (int (cmath/sqrt n))]
+            (if (= f 1)
+              true
+              (if (= 0 (mod n f))
+                false
+                (recur (dec f)))))))
 
 (defn coprime? [a b]
   (= 1 (cmath/gcd a b)))

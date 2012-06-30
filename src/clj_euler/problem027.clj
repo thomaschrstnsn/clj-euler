@@ -11,54 +11,31 @@
   (let [q (partial quadratic a b)]
     {:a a :b b :q q}))
 
-(def prime?-memo (memoize prime?))
+(def memo-prime? (memoize prime?))
 
 (defn consecutive-prime-results [q]
-  (last (take-while #(prime?-memo (q %)) (range))))
+  (last (take-while #(memo-prime? (q %)) (range))))
 
 (defn inclusive-range [start end]
   (range start (inc end)))
 
-(comment defn find-quad-with-most-consec-primes [as bs]
-  (->>                       ;(comb/cartesian-product as bs)
-                                        ;(filter #(let [[a b] %] (prime? (* a b))))
-                                        ;(filter #(let [[a b] %] (coprime? a b)))
-                                        ;(map quadratic-from-pair)
-   (for [a as, b bs
-                                        ;:when
-                                        ;         (and (prime? (* a b))             (coprime? a b))
-         ]
-     {:a a :b b :q (partial quadratic a b)})
-   (apply greatest-by #(consecutive-prime-results (% :q)))
-   ))
-
 (defn find-quad-with-most-consec-primes [as bs]
-  (let [candidates (for [a as, b bs
-                         :let [aa (cmath/abs a)
-                               ab (cmath/abs b)]
-                         ;:when (coprime? aa ab)
-                         ]
+  (let [candidates (for [a as, b bs]
                      {:a a, :b b, :qf (partial quadratic a b)})]
     (loop [[q & qs] candidates
-           best {:cp -1}
-           round 0]
+           best {:cp -1}]
       (if (nil? q)
         best
         (let [{:keys [a b]} q
-              bcp (:cp best)
-              round' (inc round)]
+              bcp (:cp best)]
           (if (< (cmath/abs b) bcp)
-            (recur qs best round')
+            (recur qs best)
             (let [qcp   (consecutive-prime-results (:qf q))
                   q'    (assoc q :cp qcp)
                   best' (if (or (nil? qcp) (>= bcp qcp))
                           best
                           q')]
-              (do
-                (comment when (= 0 (mod round 1000))
-                  (println (str "r: " round " " q)))
-                (recur qs best' round'))))
-          )))))
+              (recur qs best'))))))))
 
 (defn solve-with-bounds [b]
   (let [min (- b)
