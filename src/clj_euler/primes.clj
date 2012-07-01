@@ -30,21 +30,8 @@
 (defn primes-below [ceil]
   (take-while #(> ceil %) (lazy-primes)))
 
-(defn primes-upto-including [ceil]
-  (take-while #(<= % ceil) (lazy-primes)))
-
 (defn prime?
-  "Shamelessly stolen from: http://technicalitee.blogspot.dk/2012/03/project-euler-problem-26-and-27.html
-   def isPrime(num: Int) = {
-    @tailrec def isPrime0(n: Int): Boolean = n match {
-      case 1 => true
-      case _ => if (num % n == 0) false else isPrime0(n - 1)
-    }
-    if (num % 2 == 0 || num < 1)
-      false
-    else
-      isPrime0(Math.sqrt(num).intValue)
-  }"
+  "Shamelessly inspired from: http://technicalitee.blogspot.dk/2012/03/project-euler-problem-26-and-27.html"
   [n]
   (cond
     (< n 1) false
@@ -67,10 +54,3 @@
   (let [s  (str n)
         ld (last s)]
     (= c ld)))
-
-(comment time
- (->> (lazy-primes)
-      (take 100000)
-      (filter (partial ends-with \0))
-      (last)
-      ))
