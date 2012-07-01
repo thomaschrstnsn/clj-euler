@@ -20,8 +20,9 @@
     (count (str cn))))
 
 (defn unit-fraction-below-n-with-most-digits [n]
-  (->> (drop-while (partial > 7) (primes-below n))
-       (apply greatest-by digits-in-cyclic-number-of-n)))
+  (apply
+   greatest-by digits-in-cyclic-number-of-n
+   (drop-while (partial > 7) (primes-below n))))
 
 (defn example [] (unit-fraction-below-n-with-most-digits 10))
 

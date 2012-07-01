@@ -1,5 +1,6 @@
 (ns clj-euler.primes
-  (:require [clojure.contrib.math :as cmath]))
+  (:require [clojure.contrib.math :as cmath])
+  (:use [clj-euler.utils]))
 
 (defn lazy-primes
   "shamelessly stolen from http://clj-me.cgrand.net/2009/07/30/everybody-loves-the-sieve-of-eratosthenes/ (lazy-primes3)"
@@ -51,7 +52,7 @@
     :else (loop [f (int (cmath/sqrt n))]
             (if (= f 1)
               true
-              (if (= 0 (mod n f))
+              (if (mod-zero? n f)
                 false
                 (recur (dec f)))))))
 

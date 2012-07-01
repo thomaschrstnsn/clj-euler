@@ -13,8 +13,7 @@
     (every? (partial contains? s) rs)))
 
 (defn circular-primes-below [n]
-  (let [primes (->> (primes-below n)
-                    (into #{}))]
+  (let [primes (set (primes-below n))]
     (filter (partial contains-all-rotations? primes) primes)))
 
 (defn example []

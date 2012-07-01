@@ -33,17 +33,16 @@
        (map (partial map s->n))))
 
 (defn max-line [is]
-  (map #(max %1 %2) is (rest is)))
+  (map max is (rest is)))
 
 (defn max-path-triangle [t]
   (loop [ls   (next t)
          prev (max-line (first t))]
-    (let [this ( map #(+ %1 %2) (first ls) prev)]
+    (let [this (map + (first ls) prev)]
       (if (or (nil? (next this)) (nil? ls))
         this
         (recur (next ls)
-               (max-line this)))
-      )))
+               (max-line this))))))
 
 (defn example []
   (->> example-triangle string->triangle max-path-triangle))
