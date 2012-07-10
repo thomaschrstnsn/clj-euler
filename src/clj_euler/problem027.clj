@@ -48,7 +48,7 @@
 (def q79 (partial quadratic -79 1601))
 
 (defn problem []
-  (let [{:keys [a b]} (time (solve-with-bounds 1000))]
+  (let [{:keys [a b]} (solve-with-bounds 1000)]
     (* a b)))
 
 (defn -main []

@@ -45,10 +45,10 @@
                (max-line this))))))
 
 (defn example []
-  (->> example-triangle string->triangle max-path-triangle))
+  (->> example-triangle string->triangle max-path-triangle first))
 
 (defn problem []
-  (->> problem-triangle string->triangle max-path-triangle))
+  (->> problem-triangle string->triangle max-path-triangle first))
 
 (defn -main []
   (println (problem)))
