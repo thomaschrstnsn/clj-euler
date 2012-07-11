@@ -27,14 +27,24 @@
   (try (fn)
        (catch Exception e (str "Caught exception " (.getMessage e)))))
 
-(defn- time-fn [{:keys [timing dryrun fname]}
-                {:keys [fn problem-num]}]
+(defn- time-fn [{:keys [timing dryrun fname verify]}
+                {:keys [fn problem-num expected]}]
   (let [timer (if timing
                 #(time (%))
                 #(%))]
     (println (str "-> " fname ": " problem-num))
     (when-not dryrun
-      (println (str "==> " (timer (partial ex-wrap fn)))))))
+      (let [result      (timer (partial ex-wrap fn))
+            noexpected? (and verify
+                             (nil? expected))
+            unexpected? (and verify
+                             ((complement nil?) expected)
+                             (not= result expected))]
+        (println (str "==> " result
+                      (when unexpected?
+                        (str " IS NOT EQUALING " expected ", which was expected"))
+                      (when noexpected?
+                        (str " (no expected result)"))))))))
 
 (defn- fn->problem-number [fn]
   (->> fn
@@ -44,7 +54,8 @@
 
 (defn- fn->problem-map [fn]
   {:fn fn
-   :problem-num (fn->problem-number fn)})
+   :problem-num (fn->problem-number fn)
+   :expected ((meta fn) :expected)})
 
 (defn- problem-maps-from-namespaces [fn-symbol num-predicate]
   (->> (problem-namespaces)
@@ -79,10 +90,11 @@
 
 (defn -main [& args]
   (let [[options extra banner] (cli args
-                                    ["-e" "--example" "Only run the examples (not the full problem)." :flag true :default false]
                                     ["-a" "--all" "Run all." :flag true :default false]
+                                    ["-d" "--dryrun" "Do not actually run anything, just list what would be done." :flag true :default false]
+                                    ["-e" "--example" "Only run the examples (not the full problem)." :flag true :default false]
                                     ["-t" "--timing" "Do timing." :flag true :default true]
-                                    ["-d" "--dryrun" "Do not actually run anything, just list what would be done" :flag true :default false])
+                                    ["-v" "--verify" "Verify results from :expected metadata." :flag true :default true])
         specified-problems     (parse-problem-args! extra)]
     (when-not (or (options :all) ((complement empty?) specified-problems))
       (println "clj-euler [switches] ([problem number]*)")

@@ -16,11 +16,7 @@
   (let [primes (set (primes-below n))]
     (filter (partial contains-all-rotations? primes) primes)))
 
-(defn example []
-  (->> (circular-primes-below 100)
-       count))
-
-(defn problem []
+(defn
+  ^{:expected 55}
+  problem []
   (->> 1000000 circular-primes-below count))
-
-(defn -main [] (println (problem)))

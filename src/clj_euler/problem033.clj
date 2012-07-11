@@ -18,7 +18,9 @@
        (join "")
        (s->n)))
 
-(defn problem []
+(defn
+  ^{:expected 100}
+  problem []
   (let [r (range 10 100)
         candidates (for [n r, d r
                          :let [pc (can-phony-cancel? n d)]

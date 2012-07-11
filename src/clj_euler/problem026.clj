@@ -24,9 +24,8 @@
    greatest-by digits-in-cyclic-number-of-n
    (drop-while (partial > 7) (primes-below n))))
 
-(defn example [] (unit-fraction-below-n-with-most-digits 10))
+(defn ^{:expected 7}
+  example [] (unit-fraction-below-n-with-most-digits 10))
 
-(defn problem [] (unit-fraction-below-n-with-most-digits 1000))
-
-(defn -main []
-  (println (problem)))
+(defn ^{:expected 983}
+  problem [] (unit-fraction-below-n-with-most-digits 1000))

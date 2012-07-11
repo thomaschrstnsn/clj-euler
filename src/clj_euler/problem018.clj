@@ -44,11 +44,10 @@
         (recur (next ls)
                (max-line this))))))
 
-(defn example []
+(defn ^{:expected 23}
+  example []
   (->> example-triangle string->triangle max-path-triangle first))
 
-(defn problem []
+(defn ^{:expected 1074}
+  problem []
   (->> problem-triangle string->triangle max-path-triangle first))
-
-(defn -main []
-  (println (problem)))
