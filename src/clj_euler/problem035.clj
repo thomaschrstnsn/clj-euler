@@ -17,7 +17,8 @@
     (filter (partial contains-all-rotations? primes) primes)))
 
 (defn example []
-  (circular-primes-below 100))
+  (->> (circular-primes-below 100)
+       count))
 
 (defn problem []
   (->> 1000000 circular-primes-below count))
