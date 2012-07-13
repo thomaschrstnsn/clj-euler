@@ -5,8 +5,7 @@
   (:use [clojure.string :only [join]]))
 
 (defn- problem-ns? [ns]
-  (->> (str ns)
-       (re-find #"clj-euler.problem\d+")))
+  (re-find #"clj-euler.problem\d+" (str ns)))
 
 (defn- problem-namespaces []
   (->> (find-ns-decls-on-classpath)
@@ -41,13 +40,12 @@
 
 (defn solutions-from-namespaces [metapaths]
   (let [candidate-nss (problem-namespaces)
-        solutions     (->> (for [ns candidate-nss
-                                 mp metapaths
-                                 :let [sol-fns (solution-fns-in-ns mp ns)
-                                       sols    (map (partial fn->solution mp ns)
-                                                    (filter (complement nil?) sol-fns))]] sols)
-                           flatten)
-        nss-with-sols (->> solutions (map :ns) set)
-        nss-wo-sols   (difference candidate-nss nss-with-sols)]
+        solutions     (flatten (for [ns candidate-nss
+                                     mp metapaths]
+                                 (->> (solution-fns-in-ns mp ns)
+                                      (remove nil?)
+                                      (map (partial fn->solution mp ns)))))
+        nss-with-sols (map :ns solutions)
+        nss-wo-sols   (difference candidate-nss (set nss-with-sols))]
     (doall (map #(println "Warning: no appropriate function found in: " %) nss-wo-sols))
     (doall solutions)))
