@@ -2,8 +2,11 @@
   (:use [clj-euler utils runner])
   (:use [clojure.tools.cli :only [cli]]))
 
-(defn- enrich-options [{:keys [example] :as options} specified-problems]
-  (into options {:metapath (if example :example :solution)
+(defn- enrich-options [{:keys [examples solutions] :as options} specified-problems]
+  (into options {:metapaths   (for [kw {:example  examples
+                                        :solution solutions}
+                                    :when (second kw)]
+                                (first kw))
                  :problem-set (set specified-problems)}))
 
 (defn- parse-problem-args [args]
@@ -17,7 +20,8 @@
   [
    ["-a" "--all" "Run functions in all namespaces found." :flag true :default false]
    ["-d" "--dryrun" "Do not actually run anything, just list what would be done." :flag true :default false]
-   ["-e" "--example" "Only run the examples (not the full problem)." :flag true :default false]
+   ["-e" "--examples" "Run the examples." :flag true :default false]
+   ["-s" "--solutions" "Run the full problem solutions." :flag true :default true]
    ["-t" "--timing" "Do timing." :flag true :default true]
    ["-v" "--verify" "Verify results from :expected metadata." :flag true :default true]
    ])

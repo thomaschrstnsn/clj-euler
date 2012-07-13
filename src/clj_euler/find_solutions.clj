@@ -1,6 +1,7 @@
 (ns clj-euler.find-solutions
   (:use [clj-euler utils])
   (:use [clojure.tools.namespace :only [find-ns-decls-on-classpath]])
+  (:use [clojure.set :only [difference]])
   (:use [clojure.string :only [join]]))
 
 (defn- problem-ns? [ns]
@@ -10,7 +11,8 @@
 (defn- problem-namespaces []
   (->> (find-ns-decls-on-classpath)
        (map second)
-       (filter problem-ns?)))
+       (filter problem-ns?)
+       set))
 
 (defn- solution-fn? [metapath fn]
   (let [md (metapath (meta fn))
@@ -26,34 +28,26 @@
               (filter (partial solution-fn? metapath)))
          (catch Exception e nil))))
 
-(defn- single-namespace-solution [ns fns]
-  (let [c (count fns)]
-    (cond
-      (= 1 c) (first fns)
-      (= 0 c) (do
-                (println "Warning: no appropriate function found in: " ns)
-                nil)
-      :else (do
-              (println "Warning: more than one function found in: " ns " - namely: " (join ", " fns))
-              nil))))
-
-(defn- fn->solution [metapath fn]
+(defn- fn->solution [metapath ns fn]
   (let [solution (metapath (meta fn))
         args     (:arguments solution)]
     {:fn          #(apply fn args)
+     :ns          ns
+     :metapath    metapath
      :pure-fn     fn
-     :problem-num (->> fn
-                       str
-                       (re-find #"\d+")
-                       s->n)
+     :problem-num (->> fn str (re-find #"\d+") s->n)
      :expected    (:expected solution)
      :arguments   args}))
 
-(defn solutions-from-namespaces [metapath]
-  (doall (->> (problem-namespaces)
-              (map (fn [ns] {:fns (solution-fns-in-ns metapath ns)
-                            :ns  ns}))
-              (map (fn [{:keys [ns fns]}] (single-namespace-solution ns fns)))
-              (flatten)
-              (filter (complement nil?))
-              (map (partial fn->solution metapath)))))
+(defn solutions-from-namespaces [metapaths]
+  (let [candidate-nss (problem-namespaces)
+        solutions     (->> (for [ns candidate-nss
+                                 mp metapaths
+                                 :let [sol-fns (solution-fns-in-ns mp ns)
+                                       sols    (map (partial fn->solution mp ns)
+                                                    (filter (complement nil?) sol-fns))]] sols)
+                           flatten)
+        nss-with-sols (->> solutions (map :ns) set)
+        nss-wo-sols   (difference candidate-nss nss-with-sols)]
+    (doall (map #(println "Warning: no appropriate function found in: " %) nss-wo-sols))
+    (doall solutions)))

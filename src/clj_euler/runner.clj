@@ -7,8 +7,8 @@
   (try (fn)
        (catch Exception e (str "Caught exception " (.getMessage e)))))
 
-(defn- run-solution-fn [{:keys [timing dryrun metapath verify]}
-                {:keys [fn problem-num expected arguments pure-fn]}]
+(defn- run-solution-fn [{:keys [timing dryrun verify]}
+                        {:keys [fn problem-num expected arguments pure-fn metapath]}]
   (let [timer (if timing
                 #(time (%))
                 #(%))
@@ -27,8 +27,9 @@
                       (when noexpected?
                         (str " (no expected result)"))))))))
 
-(defn run [{:keys [metapath problem-set all] :as options}]
-  (let [all-solutions     (solutions-from-namespaces metapath)
+(defn run [{:keys [metapaths problem-set all] :as options}]
+  {:pre [((complement empty?) metapaths)]}
+  (let [all-solutions     (solutions-from-namespaces metapaths)
         specified-missing (difference problem-set
                                       (set (map :problem-num all-solutions)))
 
@@ -37,7 +38,8 @@
                             (fn [n] (contains? problem-set n)))
 
         filtered-sols     (filter (comp num-predicate :problem-num) all-solutions)
-        time-fns          (map (partial run-solution-fn options) filtered-sols)]
+        ordered-sols      (sort-by #(vec (map % [:problem-num :metapath])) filtered-sols)
+        time-fns          (map (partial run-solution-fn options) ordered-sols)]
     (when-not (empty? specified-missing)
       (println "Specified problems not implemented: " (join ", " specified-missing)))
     (doall time-fns)
