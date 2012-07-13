@@ -28,44 +28,6 @@
               (filter (partial solution-fn? metapath)))
          (catch Exception e nil))))
 
-(defn- ex-wrap [fn]
-  (try (fn)
-       (catch Exception e (str "Caught exception " (.getMessage e)))))
-
-(defn- time-fn [{:keys [timing dryrun metapath verify]}
-                {:keys [fn problem-num expected arguments]}]
-  (let [timer (if timing
-                #(time (%))
-                #(%))]
-    (println (str "-> " (name metapath) ": " problem-num))
-    (when-not dryrun
-      (let [result      (timer (partial ex-wrap fn))
-            noexpected? (and verify
-                             (nil? expected))
-            unexpected? (and verify
-                             ((complement nil?) expected)
-                             (not= result expected))]
-        (println (str "==> " result
-                      (when unexpected?
-                        (str " IS NOT EQUALING " expected ", which was expected"))
-                      (when noexpected?
-                        (str " (no expected result)"))))))))
-
-(defn- fn->problem-number [fn]
-  (->> fn
-       str
-       (re-find #"\d+")
-       s->n))
-
-(defn- fn->solution [metapath fn]
-  (let [solution (metapath (meta fn))
-        args     (:arguments solution)]
-    {:fn          #(apply fn args)
-     :pure-fn     fn
-     :problem-num (fn->problem-number fn)
-     :expected    (:expected solution)
-     :arguments   args}))
-
 (defn- single-namespace-solution [ns fns]
   (let [c (count fns)]
     (cond
@@ -77,6 +39,18 @@
               (println "Warning: more than one function found in: " ns " - namely: " (join ", " fns))
               nil))))
 
+(defn- fn->solution [metapath fn]
+  (let [solution (metapath (meta fn))
+        args     (:arguments solution)]
+    {:fn          #(apply fn args)
+     :pure-fn     fn
+     :problem-num (->> fn
+                       str
+                       (re-find #"\d+")
+                       s->n)
+     :expected    (:expected solution)
+     :arguments   args}))
+
 (defn- solutions-from-namespaces [metapath]
   (doall (->> (problem-namespaces)
               (map (fn [ns] {:fns (solution-fns-in-ns metapath ns)
@@ -85,6 +59,30 @@
               (flatten)
               (filter (complement nil?))
               (map (partial fn->solution metapath)))))
+
+(defn- exception-wrap [fn]
+  (try (fn)
+       (catch Exception e (str "Caught exception " (.getMessage e)))))
+
+(defn- run-solution-fn [{:keys [timing dryrun metapath verify]}
+                {:keys [fn problem-num expected arguments pure-fn]}]
+  (let [timer (if timing
+                #(time (%))
+                #(%))
+        fname (:name (meta pure-fn))]
+    (println (str "\n-> [problem " problem-num "/" (name metapath) "] " fname))
+    (when-not dryrun
+      (let [result      (timer (partial exception-wrap fn))
+            noexpected? (and verify
+                             (nil? expected))
+            unexpected? (and verify
+                             ((complement nil?) expected)
+                             (not= result expected))]
+        (println (str "<- " result
+                      (when unexpected?
+                        (str " IS NOT EQUALING " expected ", which was expected"))
+                      (when noexpected?
+                        (str " (no expected result)"))))))))
 
 (defn- run [{:keys [metapath problem-set all] :as options}]
   (let [all-solutions     (solutions-from-namespaces metapath)
@@ -95,8 +93,8 @@
                             (fn [n] true)
                             (fn [n] (contains? problem-set n)))
 
-        filtered-pms      (filter (comp num-predicate :problem-num) all-solutions)
-        time-fns          (map (partial time-fn options) filtered-pms)]
+        filtered-sols     (filter (comp num-predicate :problem-num) all-solutions)
+        time-fns          (map (partial run-solution-fn options) filtered-sols)]
     (when-not (empty? specified-missing)
       (println "Specified problems not implemented: " (join ", " specified-missing)))
     (doall time-fns)
