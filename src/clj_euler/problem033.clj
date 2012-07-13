@@ -19,7 +19,7 @@
        (s->n)))
 
 (defn
-  ^{:expected 100}
+  ^{:solution {:expected 100 :arguments []}}
   problem []
   (let [r (range 10 100)
         candidates (for [n r, d r

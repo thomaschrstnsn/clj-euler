@@ -17,6 +17,7 @@
     (filter (partial contains-all-rotations? primes) primes)))
 
 (defn
-  ^{:expected 55}
-  problem []
-  (->> 1000000 circular-primes-below count))
+  ^{:solution {:arguments [1000000]
+               :expected 55}}
+  solution [n]
+  (->> n circular-primes-below count))

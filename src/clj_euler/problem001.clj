@@ -8,11 +8,12 @@
                  (buzz %))
             (range))))
 
-(defn- fizzbuzz-sum-below-n [n]
+(defn
+  ^{:solution {:expected 233168
+               :arguments [1000]}
+    :example {:expected 23
+              :arguments [10]}}
+  fizzbuzz-sum-below-n [n]
   (->> (fizzbuzz)
        (take-while (partial > n))
        (apply +)))
-
-(defn ^{:expected 233168}
-  problem []
-  (fizzbuzz-sum-below-n 1000))

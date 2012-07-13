@@ -44,6 +44,14 @@
         (recur (next ls)
                (max-line this))))))
 
+(defn
+  ^{:solution {:expected 1074
+               :arguments [problem-triangle]}
+    :example  {:expected 23
+               :arguments [example-triangle]}}
+  solution [triangle]
+  (->> triangle string->triangle max-path-triangle first))
+
 (defn ^{:expected 23}
   example []
   (->> example-triangle string->triangle max-path-triangle first))

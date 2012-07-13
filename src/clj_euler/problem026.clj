@@ -19,13 +19,10 @@
   (let [cn (construct-cyclic-number n)]
     (count (str cn))))
 
-(defn unit-fraction-below-n-with-most-digits [n]
+(defn
+  ^{:solution {:expected 983 :arguments [1000]}
+    :example  {:expected 7   :arguments [10]}}
+  unit-fraction-below-n-with-most-digits [n]
   (apply
    greatest-by digits-in-cyclic-number-of-n
    (drop-while (partial > 7) (primes-below n))))
-
-(defn ^{:expected 7}
-  example [] (unit-fraction-below-n-with-most-digits 10))
-
-(defn ^{:expected 983}
-  problem [] (unit-fraction-below-n-with-most-digits 1000))

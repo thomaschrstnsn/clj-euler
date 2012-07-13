@@ -47,7 +47,7 @@
 (def q40 (partial quadratic -1 41))
 (def q79 (partial quadratic -79 1601))
 
-(defn ^{:expected -59231}
+(defn ^{:solution {:expected -59231 :arguments []}}
   problem []
   (let [{:keys [a b]} (solve-with-bounds 1000)]
     (* a b)))
