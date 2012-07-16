@@ -1,15 +1,19 @@
 # clj-euler
 
-I'm an app. Or maybe I'm a library? I haven't decided yet. 
-
-The choice is up to you!
+Solutions for [Project Euler](http://projecteuler.net/) problems implemented in the programming language Clojure.
 
 ## Usage
 
-FIXME
+`lein run PROBLEM_NUMBER`
+
+or
+
+`lein run --all`
+
+Running without arguments shows all command line options.
 
 ## License
 
-Copyright © 2012 FIXME
+Copyright © 2012 Thomas Christensen
 
 Distributed under the Eclipse Public License, the same as Clojure.
