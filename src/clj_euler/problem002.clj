@@ -1,5 +1,4 @@
-(ns clj-euler.problem002
-  (:use [clj-euler.utils]))
+(ns clj-euler.problem002)
 
 (defn- fib
   ([] (cons 1 (cons 2 (lazy-seq (fib 1 2)))))

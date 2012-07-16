@@ -45,12 +45,3 @@
 
 (defn coprime? [a b]
   (= 1 (cmath/gcd a b)))
-
-(defn- benchmark-primes []
-  (time (dotimes [n 10]
-          (last (primes-below 100000)))))
-
-(defn- ends-with [c n]
-  (let [s  (str n)
-        ld (last s)]
-    (= c ld)))
