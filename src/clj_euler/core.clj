@@ -29,9 +29,9 @@
 (defn -main [& args]
   (let [[options extra banner] (apply (partial  cli args) opt-def)
         specified-problems     (parse-problem-args extra)]
-    (when-not (or (options :all) ((complement empty?) specified-problems))
-      (println "clj-euler [switches] ([problem number]*)")
-      (println "")
-      (println banner)
-      (System/exit 0))
-    (run (enrich-options options specified-problems))))
+    (if (or (options :all) ((complement empty?) specified-problems))
+      (run (enrich-options options specified-problems))
+      (do
+        (println "clj-euler [switches] ([problem number]*)")
+        (println "")
+        (println banner)))))
