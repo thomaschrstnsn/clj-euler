@@ -45,3 +45,8 @@
 
 (defn coprime? [a b]
   (= 1 (cmath/gcd a b)))
+
+(defn factors [n]
+  (into (sorted-set)
+    (mapcat (fn [x] [x (/ n x)])
+      (filter #(zero? (rem n %)) (range 1 (inc (cmath/sqrt n)))))))
