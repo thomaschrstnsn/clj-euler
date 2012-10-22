@@ -3,7 +3,7 @@
 (defn- next-in-sequence [n]
   (cond
    (= n 1) nil
-   (even? n) (/ n 2)
+   (even? n) (bit-shift-right n 1)
    :else (inc (* 3 n))))
 
 (defn- the-sequence [n]
@@ -12,26 +12,25 @@
       [n]
       (cons n (lazy-seq (the-sequence n'))))))
 
-(defonce ^:dynamic *cache* (atom {}))
-
-(defn- cached-sequence-length [n]
-  (let [cached (get @*cache* n)]
+(defn- cached-sequence-length [cache n]
+  (let [cached (get @cache n)]
     (if (nil? cached)
       (let [n' (next-in-sequence n)]
         (if (nil? n')
           1
-          (let [l' (cached-sequence-length n')
+          (let [l' (cached-sequence-length cache n')
                 l  (inc l')]
-            (reset! *cache* (assoc @*cache* n l))
+            (reset! cache (assoc @cache n l))
             l)))
       cached)))
 
 (defn
   ^{:solution {:expected 837799 :arguments [1000000]}}
   cached-solution [limit]
-  (do
-    (dorun (->> (range 1 limit) (map cached-sequence-length)))
-    (->> @*cache* (sort-by second) (last) (first))))
+  (let [cache (atom {})]
+    (do
+      (dorun (->> (range 1 limit) (map (partial cached-sequence-length cache))))
+      (->> @cache (apply max-key second) (first)))))
 
 (defn- sequence-length
   [^Long n ^Long l]
@@ -45,11 +44,9 @@
   memoized-solution [limit]
   (let [seq-length (memoize sequence-length)]
     (->> (range 1 limit)
-         (map #(vector (seq-length % 0) %))
-         (flatten)
-         (apply sorted-map)
-         (last)
-         (second))))
+         (map #(vector % (seq-length % 0)))
+         (apply max-key second)
+         (first))))
 
 (defn- ^long imp-helper [^long j ^long this_terms]
   (if (not= j 1)
