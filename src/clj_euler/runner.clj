@@ -1,11 +1,13 @@
 (ns clj-euler.runner
   (:use [clj-euler utils find-solutions])
   (:use [clojure.set :only [difference]])
-  (:use [clojure.string :only [join]]))
+  (:use [clojure.string :only [join]])
+  (:use [clansi.core :only [style]]))
 
 (defn- exception-wrap [fn]
   (try (fn)
-       (catch Exception e (str "Caught exception " (.getMessage e)))))
+       (catch Exception e
+         (str "Caught exception " (.getMessage e)))))
 
 (defn- run-solution-fn [{:keys [timing dryrun verify]}
                         {:keys [fn problem-num expected arguments pure-fn metapath]}]
@@ -13,7 +15,13 @@
                 #(time (%))
                 #(%))
         fname (:name (meta pure-fn))]
-    (println (str "\n-> [problem " problem-num "/" (name metapath) "] " fname))
+    (println (str (style "[" :white)
+                  (style (str "problem ") :cyan)
+                  (style (str problem-num) :yellow)
+                  (style " / " :white)
+                  (style (str (name metapath)) :cyan)
+                  (style "] " :white)
+                  (style fname :yellow)))
     (when-not dryrun
       (let [result      (timer (partial exception-wrap fn))
             noexpected? (and verify
@@ -21,12 +29,17 @@
             unexpected? (and verify
                              ((complement nil?) expected)
                              (not= result expected))]
-        (println (str "<- " result
-                      (when unexpected?
-                        (str " IS NOT EQUALING " expected ", which was expected"))
-                      (when noexpected?
-                        (str " (no expected result)"))))))))
-
+        (println
+         (str
+          (when-not (or unexpected? noexpected?)
+            (style (str "=== " result) :green))
+          (when unexpected?
+            (str (style "!!!" :black :bg-red)
+                 (style (str " " result " was not expected: " expected) :red)))
+          (when noexpected?
+            (str (style "???" :bg-yellow :black)
+                 (style (str " " result " (no expected result)") :yellow)))
+          "\n"))))))
 (defn run [{:keys [metapaths problem-set all] :as options}]
   {:pre [((complement empty?) metapaths)]}
   (let [all-solutions     (solutions-from-namespaces metapaths)
