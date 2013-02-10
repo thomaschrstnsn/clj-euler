@@ -2,7 +2,8 @@
   (:use [clj-euler utils])
   (:use [clojure.tools.namespace :only [find-ns-decls-on-classpath]])
   (:use [clojure.set :only [difference]])
-  (:use [clojure.string :only [join]]))
+  (:use [clojure.string :only [join]])
+  (:use [clansi.core :only [style]]))
 
 (defn- problem-ns? [ns]
   (re-find #"clj-euler.problem\d+" (str ns)))
@@ -47,5 +48,9 @@
                                       (map (partial fn->solution mp ns)))))
         nss-with-sols (map :ns solutions)
         nss-wo-sols   (difference candidate-nss (set nss-with-sols))]
-    (doall (map #(println "Warning: no appropriate function found in: " %) nss-wo-sols))
+    (doall (map #(println
+                  (style "Warning:" :yellow :underline)
+                  "no appropriate function found in:"
+                  (style % :yellow))
+                nss-wo-sols))
     (doall solutions)))

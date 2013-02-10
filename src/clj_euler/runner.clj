@@ -7,7 +7,7 @@
 (defn- exception-wrap [fn]
   (try (fn)
        (catch Exception e
-         (str "Caught exception " (.getMessage e)))))
+         (style (str "Caught exception " (.getMessage e)) :red))))
 
 (defn- run-solution-fn [{:keys [timing dryrun verify]}
                         {:keys [fn problem-num expected arguments pure-fn metapath]}]
@@ -17,11 +17,11 @@
         fname (:name (meta pure-fn))]
     (println (str (style "[" :white)
                   (style (str "problem ") :cyan)
-                  (style (str problem-num) :yellow)
+                  (style (format "% 3d" problem-num) :yellow)
                   (style " / " :white)
                   (style (str (name metapath)) :cyan)
-                  (style "] " :white)
-                  (style fname :yellow)))
+                  (style "]" :white))
+             (style fname :yellow))
     (when-not dryrun
       (let [result      (timer (partial exception-wrap fn))
             noexpected? (and verify
